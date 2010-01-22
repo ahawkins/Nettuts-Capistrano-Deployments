@@ -1,0 +1,33 @@
+<% title @book.title %>
+
+<%= simple_format @book.thoughts %>
+
+<% if @comments %>
+	<h3>Comments</h3>
+	
+	<% for comment in @comments do %>
+		<p><strong><%=h(comment.author) %></strong>:</p> 
+		<%= simple_format comment.text %>
+	<% end %>
+	
+	<%= will_paginate @comments %>
+<% end %>
+
+<h3>Post Your Comment</h3>
+<% form_for([@book, Comment.new]) do |form| %>
+	<p><%= form.label :author %></p>
+	<p><%= form.text_field :author %></p>
+	
+	<p><%= form.label :text, 'Comment' %></p>
+	<p><%= form.text_area :text %></p>
+	
+	<%= form.submit 'Save' %>
+<% end %>
+
+<% if current_admin %>
+<p>
+	Admin Actions: 
+	<%= link_to 'Edit', edit_book_path(@book) %> |
+	<%= link_to 'Delete', book_path(@book), :method => :delete, :confirm => "Are you sure?" %>
+</p>
+<% end %>
