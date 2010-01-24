@@ -14,9 +14,7 @@ role :app, "192.168.1.112"                          # This may be the same as yo
 role :db,  "192.168.1.112", :primary => true # This is where Rails migrations will run
 role :db,  "192.168.1.112"
 
-# If you are using Passenger mod_rails uncomment this:
-# if you're still using the script/reapear helper you will need
-# these http://github.com/rails/irs_process_scripts
+default_run_options[:pty] = true
 
 namespace :deploy do
    task :start do ; end
@@ -24,4 +22,13 @@ namespace :deploy do
    task :restart, :roles => :app, :except => { :no_release => true } do
      run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
    end
+   
+   desc "Installs required gems"
+   task :gems, :roles => :app do
+     run "cd #{current_path} && sudo rake gems:install RAILS_ENV=production"
+   end
+   after "deploy:setup", "deploy:gems"   
+   
+   before "deploy", "deploy:web:disable"
+   after "deploy", "deploy:web:enable"
 end
